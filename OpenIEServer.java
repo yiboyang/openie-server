@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JsonServer {
+public class OpenIEServer {
     private static final String HOSTNAME = "localhost";
     private static final int PORT = 9001;
     private static final int BACKLOG = 1;
