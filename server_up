@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # set path to openie jar
 openie=./openie-4.1.jar
 

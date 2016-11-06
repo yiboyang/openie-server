@@ -1,6 +1,6 @@
 # openie-server
 Simple JSON server for [Open IE system by the University of Washington](http://knowitall.github.io/openie/).
-Currently supports openie v.4.1 and Java 8.
+Currently supports openie v4.1 and Java 8.
 
 Usage:
 * Step 1: If you don't have the openie jar already, [grab it](http://knowitall.cs.washington.edu/openie/release/openie-4.1.jar) and put it in current directory; otherwise make a symlink to your existing jar in current directory.

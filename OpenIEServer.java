@@ -69,9 +69,8 @@ public class OpenIEServer {
                 switch (requestMethod) {
                     case METHOD_GET:
                         final Map<String, List<String>> requestParameters = getRequestParameters(he.getRequestURI());
-                        // do something with the request parameters
                         List<String> texts = requestParameters.get(TEXT_PARAM);
-                        // we only allow one 'text' param for now
+                        // we only allow one 'text' value for now
                         if (texts != null) {
                             String text = texts.get(0);
                             // extract relations here
@@ -131,8 +130,7 @@ public class OpenIEServer {
         // will be a list of instances, each a dictionary
         LOGGER.info("Extracting from text: \n" + text);
         StringBuilder sb = new StringBuilder();
-        // begin instances list
-        sb.append("[");
+        sb.append("["); // begin instances list
 
         Seq<Instance> extractions = openie.extract(text);
         Iterator<Instance> iterator = extractions.iterator();
@@ -158,8 +156,7 @@ public class OpenIEServer {
 
             sb.append(",");
 
-            // a list of arg2s
-            sb.append("\"arg2s\":");
+            sb.append("\"arg2s\":"); // begin list of arg2s
             sb.append("[");
             Iterator<Part> argIter = inst.extr().arg2s().iterator();
             while (argIter.hasNext()) {
@@ -180,8 +177,7 @@ public class OpenIEServer {
         // pop the trailing comma for valid JSON
         sb.setLength(sb.length()-1);
 
-        // end instances list
-        sb.append("]");
+        sb.append("]"); // end instances list
 
         return sb.toString();
     }
