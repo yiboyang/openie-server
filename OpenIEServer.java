@@ -136,24 +136,42 @@ public class OpenIEServer {
         Iterator<Instance> iterator = extractions.iterator();
         while (iterator.hasNext()) {
             Instance inst = iterator.next();
-            sb.append("{");
+            sb.append("{"); // begin instance dict
+
             sb.append("\"confidence\":");
             sb.append(inst.confidence());
-
             sb.append(",");
 
-            sb.append("\"arg1\":");
+            sb.append("\"context\":");
             sb.append("\"");
-            sb.append(inst.extr().arg1().text());
+            sb.append(inst.extr().context().toString());
             sb.append("\"");
+            sb.append(",");
 
+            sb.append("\"negated\":");
+            sb.append((inst.extr().negated()) ? "1" : "0");
+            sb.append(",");
+
+            sb.append("\"passive\":");
+            sb.append((inst.extr().passive()) ? "1" : "0");
+            sb.append(",");
+
+            sb.append("\"string\":");
+            sb.append("\"");
+            sb.append(inst.extr().toString());  // should be equivant to extr().tripleString()
+            sb.append("\"");
             sb.append(",");
 
             sb.append("\"rel\":");
             sb.append("\"");
             sb.append(inst.extr().rel().text());
             sb.append("\"");
+            sb.append(",");
 
+            sb.append("\"arg1\":");
+            sb.append("\"");
+            sb.append(inst.extr().arg1().text());
+            sb.append("\"");
             sb.append(",");
 
             sb.append("\"arg2s\":"); // begin list of arg2s
