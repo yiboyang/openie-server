@@ -7,7 +7,7 @@ Demo.class: Demo.java
 	javac -cp $(openie) Demo.java
 
 OpenIEServer.class: OpenIEServer.java
-	javac OpenIEServer.java
+	javac -cp $(openie) OpenIEServer.java
 
 clean:
 	rm -f *.class

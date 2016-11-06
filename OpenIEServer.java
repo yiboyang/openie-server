@@ -14,14 +14,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 // openie stuff
-//import scala.collection.Iterator;
-//import scala.collection.Seq;
-//import edu.knowitall.openie.*;
-//import edu.knowitall.tool.parse.ClearParser;
-//import edu.knowitall.tool.postag.ClearPostagger;
-//import edu.knowitall.tool.postag.Postagger;
-//import edu.knowitall.tool.srl.ClearSrl;
-//import edu.knowitall.tool.tokenize.ClearTokenizer;
+import scala.collection.Iterator;
+import scala.collection.Seq;
+import edu.knowitall.openie.*;
+import edu.knowitall.tool.parse.ClearParser;
+import edu.knowitall.tool.postag.ClearPostagger;
+import edu.knowitall.tool.postag.Postagger;
+import edu.knowitall.tool.srl.ClearSrl;
+import edu.knowitall.tool.tokenize.ClearTokenizer;
 
 public class OpenIEServer {
     private static final String HOSTNAME = "localhost";
@@ -49,15 +49,14 @@ public class OpenIEServer {
 
     public static void main(final String... args) throws IOException {
         if (args.length < 1) {
-            //LOGGER.log(Level.FINE, "Serving Openie 4.1 on default port: " + PORT);
             LOGGER.info("Serving Openie 4.1 on default port: " + PORT);
         }
 
         final HttpServer server = HttpServer.create(new InetSocketAddress(HOSTNAME, PORT), BACKLOG);
 
-//        OpenIE openIE = new OpenIE(new ClearParser(new ClearPostagger(new ClearTokenizer(ClearTokenizer.defaultModelUrl()))),
-//                new ClearSrl(), false);
-//        LOGGER.log(Level.FINE, "Finished loading Openie...")
+        OpenIE openIE = new OpenIE(new ClearParser(new ClearPostagger(new ClearTokenizer(ClearTokenizer.defaultModelUrl()))),
+                new ClearSrl(), false);
+        LOGGER.info("Finished loading Openie...");
 
         server.createContext("/", he -> {
             try {
@@ -65,25 +64,22 @@ public class OpenIEServer {
                 final String requestMethod = he.getRequestMethod().toUpperCase();
                 switch (requestMethod) {
                     case METHOD_GET:
-                        // LOGGER.log(Level.FINE, "Handling GET request");
-                        LOGGER.info("Handling GET request");
                         final Map<String, List<String>> requestParameters = getRequestParameters(he.getRequestURI());
                         // do something with the request parameters
                         List<String> texts = requestParameters.get(TEXT_PARAM);
                         // we only allow one 'text' param for now
                         if (texts != null) {
                             String text = texts.get(0);
-                            System.out.println(text);
-                            //LOGGER.log(Level.FINE, "Param "+TEXT_PARAM+" = "+text);
-                            LOGGER.info("Param "+TEXT_PARAM+" = "+text);
+                            // extract relations here
+                            final String responseBody = openieExtractRelations(openIE, text);
+                            headers.set(HEADER_CONTENT_TYPE, String.format("application/json; charset=%s", CHARSET));
+                            final byte[] rawResponseBody = responseBody.getBytes(CHARSET);
+                            he.sendResponseHeaders(STATUS_OK, rawResponseBody.length);
+                            he.getResponseBody().write(rawResponseBody);
                         }
-
-
-                        final String responseBody = "{\"arg1\": \"Obama\", \"rel\": \"gave\", \"arg2s\": [\"a speech\", \"a speech yesterday\"]}";
-                        headers.set(HEADER_CONTENT_TYPE, String.format("application/json; charset=%s", CHARSET));
-                        final byte[] rawResponseBody = responseBody.getBytes(CHARSET);
-                        he.sendResponseHeaders(STATUS_OK, rawResponseBody.length);
-                        he.getResponseBody().write(rawResponseBody);
+                        else {
+                            LOGGER.info("Null request");
+                        }
                         break;
                     case METHOD_OPTIONS:
                         headers.set(HEADER_ALLOW, ALLOWED_METHODS);
@@ -125,30 +121,64 @@ public class OpenIEServer {
         }
     }
 
-//    private static String openieExtractRelations(OpenIE openie, String text) {
-//        System.out.println("Extracting from text: \n" + text);
-//        Seq<Instance> extractions = openIE.extract(text);
-//        Iterator<Instance> iterator = extractions.iterator();
-//        while (iterator.hasNext()) {
-//            Instance inst = iterator.next();
-//            StringBuilder sb = new StringBuilder();
-//            sb.append(inst.confidence())
-//                .append('\t')
-//                .append(inst.extr().arg1().text())
-//                .append('\t')
-//                .append(inst.extr().rel().text())
-//                .append('\t');
-//
-//            Iterator<Part> argIter = inst.extr().arg2s().iterator();
-//            while (argIter.hasNext()) {
-//                Part arg = argIter.next();
-//                sb.append(arg.text()).append("; ");
-//            }
-//
-//            System.out.println(sb.toString());
-//        }
-//
-//
-//
-//    }
+    private static String openieExtractRelations(OpenIE openie, String text) {
+        // example JSON returned:
+        // [{"confidence":0.8,"arg1":"Obama","rel":"gave","arg2s":["a speech","a speech on Tuesday"]}]
+        // will be a list of instances, each a dictionary
+        LOGGER.info("Extracting from text: \n" + text);
+        StringBuilder sb = new StringBuilder();
+        // begin instances list
+        sb.append("[");
+
+        Seq<Instance> extractions = openie.extract(text);
+        Iterator<Instance> iterator = extractions.iterator();
+        while (iterator.hasNext()) {
+            Instance inst = iterator.next();
+            sb.append("{");
+            sb.append("\"confidence\":");
+            sb.append(inst.confidence());
+
+            sb.append(",");
+
+            sb.append("\"arg1\":");
+            sb.append("\"");
+            sb.append(inst.extr().arg1().text());
+            sb.append("\"");
+
+            sb.append(",");
+
+            sb.append("\"rel\":");
+            sb.append("\"");
+            sb.append(inst.extr().rel().text());
+            sb.append("\"");
+
+            sb.append(",");
+
+            // a list of arg2s
+            sb.append("\"arg2s\":");
+            sb.append("[");
+            Iterator<Part> argIter = inst.extr().arg2s().iterator();
+            while (argIter.hasNext()) {
+                sb.append("\"");
+                Part arg = argIter.next();
+                sb.append(arg.text());
+                sb.append("\"");
+                sb.append(",");
+            }
+            // pop the trailing comma for valid JSON
+            sb.setLength(sb.length()-1);
+            sb.append("]"); // end args2 list
+
+            sb.append("}"); // end instance dict
+
+            sb.append(",");
+        }
+        // pop the trailing comma for valid JSON
+        sb.setLength(sb.length()-1);
+
+        // end instances list
+        sb.append("]");
+
+        return sb.toString();
+    }
 }
