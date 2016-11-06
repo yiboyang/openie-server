@@ -15,11 +15,19 @@ Usage:
 >>> [{'arg1': 'Some people',
     'arg2s': ['President Obama was born in Kenya'],
     'confidence': 0.9225110574705064,
-    'rel': 'think'},
+    'context': 'None',
+    'negated': 0,
+    'passive': 0,
+    'rel': 'think',
+    'string': '(Some people; think; President Obama was born in Kenya)'},
     {'arg1': 'President Obama',
     'arg2s': ['in Kenya'],
     'confidence': 0.9240540007105948,
-    'rel': 'was born'}]
+    'context': 'Some(Some people think)',
+    'negated': 0,
+    'passive': 1,
+    'rel': 'was born',
+    'string': 'Some people think:(President Obama; was born; in Kenya)'}]
 ```
 
 
