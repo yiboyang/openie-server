@@ -1,7 +1,8 @@
 /**
  *
  */
-// https://github.com/knowitall/openie/issues/7
+// This demo shows how to interface with openie API; you don't need it to run
+// OpenIEServer
 import scala.collection.Iterator;
 import scala.collection.Seq;
 import edu.knowitall.openie.*;
