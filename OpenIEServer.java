@@ -25,7 +25,7 @@ import edu.knowitall.tool.tokenize.ClearTokenizer;
 
 public class OpenIEServer {
     private static final String HOSTNAME = "localhost";
-    private static final int PORT = 9001;
+    private static int PORT = 8080; // default; allow custom setting as well
     private static final int BACKLOG = 1;
 
     private static final Logger LOGGER = Logger.getLogger(OpenIEServer.class.getName());
@@ -50,6 +50,10 @@ public class OpenIEServer {
     public static void main(final String... args) throws IOException {
         if (args.length < 1) {
             LOGGER.info("Serving Openie 4.1 on default port: " + PORT);
+        }
+        else {
+            PORT = Integer.parseInt(args[0]);
+            LOGGER.info("Serving Openie 4.1 on port: " + PORT);
         }
 
         final HttpServer server = HttpServer.create(new InetSocketAddress(HOSTNAME, PORT), BACKLOG);
