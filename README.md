@@ -1,5 +1,5 @@
 # openie-server
-Simple JSON server for [Open IE system by the University of Washington](http://knowitall.github.io/openie/).
+Simple JSON server for the [Open IE system by the University of Washington](http://knowitall.github.io/openie/).
 Currently supports openie v4.1 and Java 8.
 
 Usage:

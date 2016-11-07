@@ -185,7 +185,8 @@ public class OpenIEServer {
                 sb.append(",");
             }
             // pop the trailing comma for valid JSON
-            sb.setLength(sb.length()-1);
+            if (sb.charAt(sb.length() - 1) == ',')
+                sb.setLength(sb.length() - 1);
             sb.append("]"); // end args2 list
 
             sb.append("}"); // end instance dict
@@ -193,7 +194,8 @@ public class OpenIEServer {
             sb.append(",");
         }
         // pop the trailing comma for valid JSON
-        sb.setLength(sb.length()-1);
+        if (sb.charAt(sb.length() - 1) == ',')
+            sb.setLength(sb.length() - 1);
 
         sb.append("]"); // end instances list
 
